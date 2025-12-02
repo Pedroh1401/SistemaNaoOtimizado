@@ -1,0 +1,81 @@
+﻿@model IEnumerable<SistemaNaoOtimizado.Models.Produto>
+
+@{
+    ViewData["Title"] = "Versão Lenta";
+}
+
+<div class="container mt-4">
+
+    @if (TempData["Mensagem"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show">
+            @TempData["Mensagem"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <strong>⚙️ Painel de Controle</strong>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-6 border-end">
+                    <h5>1. Preparar Banco de Dados</h5>
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <form asp-action="GerarDadosMassivos" method="post">
+                            <button class="btn btn-outline-primary btn-sm">📥 Popular (2.000 itens)</button>
+                        </form>
+                        <form asp-action="LimparDados" method="post" onsubmit="return confirm('Apagar tudo?');">
+                            <button class="btn btn-outline-danger btn-sm">🗑️ Limpar Tudo</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>2. Testar Performance</h5>
+                    <p class="text-muted small">Clique para buscar TODOS os 2.000 registros</p>
+
+                    <a href="@Url.Action("Index", new { iniciarTeste = true })" class="btn btn-danger btn-lg w-100">
+                        ⏱️ EXECUTAR TESTE DE LENTIDÃO
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.TesteExecutado == true)
+    {
+        <div class="alert alert-danger text-center">
+            <h1>🔴 Resultado: @ViewBag.Tempo</h1>
+            <p>Exibindo <strong>@Model.Count() registros</strong>.</p>
+        </div>
+
+        <table class="table table-bordered table-hover mt-3">
+            <thead class="table-dark">
+                <tr><th>ID</th><th>Produto</th><th>Categoria</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Nome</td>
+                        <td>@item.Categoria?.Nome</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-center text-muted mb-5">
+            <small>Fim da lista de 2.000 itens.</small>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 text-muted">
+            <h4>Aguardando início do teste...</h4>
+            <p>Certifique-se de ter populado o banco e clique no botão vermelho acima.</p>
+        </div>
+    }
+</div>
